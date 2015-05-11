@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lanterna</string>
+    <string name="AdError">Errore, Annuncio non caricato!</string>
+    <string name="OnOff">ON / OFF</string>
+    <string name="interstitial_ad_sample">Annuncio a schermo intero</string>
+    <string name="linterna">Lanterna</string>
+    <string name="next_level">Seguente Artícolo</string>
+    <string name="otras_apps">Altre Applicazioni</string>
+    <string name="pulsaste">Hai premuto ON / OFF</string>
+    <string name="salir">Uscita</string>
+    <string name="start_level">Levello 1</string>
+    <string name="Level">Livello</string>
+</resources>

@@ -1,0 +1,215 @@
+Index: app/src/main/java/com/spc/acrux/linterna/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/spc/acrux/linterna/MainActivity.java	(revision )
++++ app/src/main/java/com/spc/acrux/linterna/MainActivity.java	(revision )
+@@ -17,6 +17,8 @@
+ import android.widget.TextView;
+ import android.widget.Toast;
+ 
++import com.apptracker.android.track.AppTracker;
++import com.flurry.android.FlurryAgent;
+ import com.google.android.gms.ads.AdListener;
+ import com.google.android.gms.ads.AdRequest;
+ import com.google.android.gms.ads.AdView;
+@@ -24,11 +26,7 @@
+ 
+ import java.io.IOException;
+ 
+-
+ public class MainActivity extends ActionBarActivity {
+-    // Remove the below line after defining your own ad unit ID.
+-    //private static final String TOAST_TEXT = "Test ads are being shown. "
+-    //        + "To show live ads, replace the ad unit ID in res/values/strings.xml with your own ad unit ID.";
+ 
+     private static final int START_LEVEL = 1;
+     private int mLevel;
+@@ -41,21 +39,43 @@
+ 
+ 
+     @Override
++    public void onStart() {
++        super.onStart();
++        // configure Flurry
++        FlurryAgent.setLogEnabled(false);
++        // init Flurry
++        FlurryAgent.init(this, "83JPVFJC56B2PR9NWMXW");
++        FlurryAgent.onStartSession(this,"83JPVFJC56B2PR9NWMXW" );
++    }
++
++
++    @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_main);
+ 
+-        // Mostrar un anuncio
++        // Para LeadBolt
++        if(savedInstanceState == null) {
++            // Initialize Leadbolt SDK with your api key
++            AppTracker.startSession(getApplicationContext(), "hhxSJ6GsjLqcGFQgIA7zunbhKe5NbX1k");
++        }
++        // cache Leadbolt Ad without showing it
++        AppTracker.loadModuleToCache(getApplicationContext(),"inapp");
++
++        // call this when you want to display the Leadbolt Interstitial
++        //AppTracker.loadModule(getApplicationContext(),"inapp");
++
++
++        // Mostrar un anuncio de AdMob
+-       AdView mAdView = (AdView) findViewById(R.id.adView);
++        AdView mAdView = (AdView) findViewById(R.id.adView);
+         AdRequest adRequest = new AdRequest.Builder().build();
+         mAdView.loadAd(adRequest);
+ 
++        AppTracker.loadModule(getApplicationContext(), "inapp");
+ 
+-
+         // Crear el boton ON / OFF
+         Button holaPlayerBtn = (Button)findViewById(R.id.buttononoff);
+ 
+-
+         Context context = this;
+         PackageManager pm = context.getPackageManager();
+ 
+@@ -66,6 +86,7 @@
+         }
+ 
+         camera = Camera.open();
++
+         try {
+             camera.setPreviewTexture(new SurfaceTexture(0));
+         } catch (IOException e) {
+@@ -109,9 +130,6 @@
+         });
+         loadInterstitial();
+ 
+-        // Toasts the test ad message on the screen. Remove this after defining your own ad unit ID.
+-        //Toast.makeText(this, TOAST_TEXT, LENGTH_LONG).show();
+-
+         //Lo que hace el botón "Hola" que se usa para encender y apagar la linterna
+         holaPlayerBtn.setOnClickListener(new View.OnClickListener() {
+             @Override
+@@ -130,8 +148,18 @@
+                         camera.stopPreview();
+                         isLighOn = false;
+ 
+-                    } else {
++                    } else {  //Si camera == null es que se ha liberado la cámara, hay que abrirla otra vez
++                        if (camera == null){
++                            camera = Camera.open();
+ 
++                            try {
++                                camera.setPreviewTexture(new SurfaceTexture(0));
++                            } catch (IOException e) {
++                                e.printStackTrace();
++                            }
++                            final Parameters p = camera.getParameters();
++                        }
++
+                         Log.i("info", "torch is turn on!");
+ 
+                         p.setFlashMode(Parameters.FLASH_MODE_TORCH);
+@@ -149,11 +177,8 @@
+                 }
+             }
+         });
+-
+-
+     }
+ 
+-
+     @Override
+     public boolean onCreateOptionsMenu(Menu menu) {
+         // Inflate the menu; this adds items to the action bar if it is present.
+@@ -172,10 +197,14 @@
+                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://search?q=pub:\"Pedro Santangelo\"") ) );
+                 return true;
+             case R.id.salir:
+-               // FlurryAgent.onEndSession(this);
++                FlurryAgent.onEndSession(this);
+             {
+                 if (camera != null) {
++                    camera.setPreviewCallback(null);
++                    camera.stopPreview();
+                     camera.release();
++                    //Quitar
++                    //Toast.makeText(MainActivity.this, "Liberada en Menú", Toast.LENGTH_LONG).show();
+                 }
+ 
+                 this.finish();
+@@ -206,18 +235,12 @@
+ 
+     private void goToNextLevel() {
+         // Show the next level and reload the ad to prepare for the level after.
+-        mLevelTextView.setText("Level " + (++mLevel));
++        mLevelTextView.setText(getString(R.string.Level) + " " + (++mLevel));
+         loadInterstitial();
+ 
+     }
+ 
+-    //public void activar() {
+-    //Activar o desactivar la linterna... no se usa ya.
+-    //    final String TEXTO = "Pulsaste ON / OFF ";
+-    //    Toast.makeText(this, TEXTO, LENGTH_LONG).show();
+-
+-    //}
+-
++/*
+     @Override
+     protected void onDestroy() {
+         super.onDestroy();
+@@ -225,24 +248,43 @@
+             camera.release();
+         }
+     }
+-/*
++
++*/
+     @Override
+-    public void onPause() {
+-        super.onPause();
++    protected void onDestroy() {
++        super.onDestroy();
++        if (isFinishing()) {
+-        if (camera != null) {
++            if (camera != null) {
++                // Salimos de la aplicación, liberar cámara
++                camera.setPreviewCallback(null);
++                camera.stopPreview();
+-            camera.release();
++                camera.release();
+-        }
++                //Quitar
++                //Toast.makeText(MainActivity.this, "Liberada en onDestroy", Toast.LENGTH_LONG).show();
+ 
++            } else {
++                //It's an orientation change.
+-    }
++            }
++        } else {
++            //It's an orientation change.
++        }
++    }
+ 
++
+     @Override
+     public void onStop() {
++        // Cerrar Sesión de Flurry
++        FlurryAgent.onEndSession(this);
+         super.onStop();
+         if (camera != null) {
++            camera.setPreviewCallback(null);
++            camera.stopPreview();
+             camera.release();
++            //Quitar
++            //Toast.makeText(MainActivity.this, "Liberada en onStop", Toast.LENGTH_LONG).show();
+         }
+ 
+     }
+-*/
++
+ 
+ }

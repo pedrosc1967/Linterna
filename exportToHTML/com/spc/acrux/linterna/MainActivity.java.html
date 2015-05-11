@@ -1,0 +1,314 @@
+<html>
+<head>
+<title>MainActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { }
+.s2 { color: rgb(0,0,255); }
+.s3 { color: rgb(128,128,128); font-style: italic; }
+.s4 { color: rgb(0,128,0); font-weight: bold; }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+MainActivity.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+
+<span class="s0">package </span><span class="s1">com.spc.acrux.linterna; 
+ 
+</span><span class="s0">import </span><span class="s1">android.content.Context; 
+</span><span class="s0">import </span><span class="s1">android.content.Intent; 
+</span><span class="s0">import </span><span class="s1">android.content.pm.PackageManager; 
+</span><span class="s0">import </span><span class="s1">android.graphics.SurfaceTexture; 
+</span><span class="s0">import </span><span class="s1">android.hardware.Camera; 
+</span><span class="s0">import </span><span class="s1">android.hardware.Camera.Parameters; 
+</span><span class="s0">import </span><span class="s1">android.net.Uri; 
+</span><span class="s0">import </span><span class="s1">android.os.Bundle; 
+</span><span class="s0">import </span><span class="s1">android.support.v7.app.ActionBarActivity; 
+</span><span class="s0">import </span><span class="s1">android.util.Log; 
+</span><span class="s0">import </span><span class="s1">android.view.Menu; 
+</span><span class="s0">import </span><span class="s1">android.view.MenuItem; 
+</span><span class="s0">import </span><span class="s1">android.view.View; 
+</span><span class="s0">import </span><span class="s1">android.widget.Button; 
+</span><span class="s0">import </span><span class="s1">android.widget.TextView; 
+</span><span class="s0">import </span><span class="s1">android.widget.Toast; 
+ 
+</span><span class="s0">import </span><span class="s1">com.apptracker.android.track.AppTracker; 
+</span><span class="s0">import </span><span class="s1">com.flurry.android.FlurryAgent; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.ads.AdListener; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.ads.AdRequest; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.ads.AdView; 
+</span><span class="s0">import </span><span class="s1">com.google.android.gms.ads.InterstitialAd; 
+ 
+</span><span class="s0">import </span><span class="s1">java.io.IOException; 
+ 
+</span><span class="s0">public class </span><span class="s1">MainActivity </span><span class="s0">extends </span><span class="s1">ActionBarActivity { 
+ 
+    </span><span class="s0">private static final int </span><span class="s1">START_LEVEL = </span><span class="s2">1</span><span class="s1">; 
+    </span><span class="s0">private int </span><span class="s1">mLevel; 
+    </span><span class="s0">private </span><span class="s1">Button mNextLevelButton; 
+    </span><span class="s0">private </span><span class="s1">InterstitialAd mInterstitialAd; 
+    </span><span class="s0">private </span><span class="s1">TextView mLevelTextView; 
+    </span><span class="s0">private </span><span class="s1">Camera camera; 
+    </span><span class="s3">//flag to detect flash is on or off</span><span class="s1"> 
+    </span><span class="s0">private boolean </span><span class="s1">isLighOn = </span><span class="s0">false</span><span class="s1">; 
+ 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onStart() { 
+        </span><span class="s0">super</span><span class="s1">.onStart(); 
+</span><span class="s3">// configure Flurry</span><span class="s1"> 
+        FlurryAgent.setLogEnabled(</span><span class="s0">false</span><span class="s1">); 
+</span><span class="s3">// init Flurry</span><span class="s1"> 
+        FlurryAgent.init(</span><span class="s0">this</span><span class="s1">, </span><span class="s4">&quot;83JPVFJC56B2PR9NWMXW&quot;</span><span class="s1">); 
+        FlurryAgent.onStartSession(</span><span class="s0">this</span><span class="s1">,</span><span class="s4">&quot;83JPVFJC56B2PR9NWMXW&quot; </span><span class="s1">); 
+    } 
+ 
+ 
+    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) { 
+        </span><span class="s0">super</span><span class="s1">.onCreate(savedInstanceState); 
+        setContentView(R.layout.activity_main); 
+ 
+        </span><span class="s3">// Para LeadBolt</span><span class="s1"> 
+        </span><span class="s0">if</span><span class="s1">(savedInstanceState == </span><span class="s0">null</span><span class="s1">) { 
+            </span><span class="s3">// Initialize Leadbolt SDK with your api key</span><span class="s1"> 
+            AppTracker.startSession(getApplicationContext(), </span><span class="s4">&quot;hhxSJ6GsjLqcGFQgIA7zunbhKe5NbX1k&quot;</span><span class="s1">); 
+        } 
+        </span><span class="s3">// cache Leadbolt Ad without showing it</span><span class="s1"> 
+        AppTracker.loadModuleToCache(getApplicationContext(),</span><span class="s4">&quot;inapp&quot;</span><span class="s1">); 
+ 
+        </span><span class="s3">// call this when you want to display the Leadbolt Interstitial</span><span class="s1"> 
+        </span><span class="s3">//AppTracker.loadModule(getApplicationContext(),&quot;inapp&quot;);</span><span class="s1"> 
+ 
+ 
+        </span><span class="s3">// Mostrar un anuncio de AdMob</span><span class="s1"> 
+        AdView mAdView = (AdView) findViewById(R.id.adView); 
+        AdRequest adRequest = </span><span class="s0">new </span><span class="s1">AdRequest.Builder().build(); 
+        mAdView.loadAd(adRequest); 
+ 
+        AppTracker.loadModule(getApplicationContext(), </span><span class="s4">&quot;inapp&quot;</span><span class="s1">); 
+ 
+        </span><span class="s3">// Crear el boton ON / OFF</span><span class="s1"> 
+        Button holaPlayerBtn = (Button)findViewById(R.id.buttononoff); 
+ 
+        Context context = </span><span class="s0">this</span><span class="s1">; 
+        PackageManager pm = context.getPackageManager(); 
+ 
+        </span><span class="s3">// if device support camera?</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(!pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) { 
+            Log.e(</span><span class="s4">&quot;err&quot;</span><span class="s1">, </span><span class="s4">&quot;Device has no camera!&quot;</span><span class="s1">); 
+            </span><span class="s0">return</span><span class="s1">; 
+        } 
+ 
+        camera = Camera.open(); 
+ 
+        </span><span class="s0">try </span><span class="s1">{ 
+            camera.setPreviewTexture(</span><span class="s0">new </span><span class="s1">SurfaceTexture(</span><span class="s2">0</span><span class="s1">)); 
+        } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+            e.printStackTrace(); 
+        } 
+        </span><span class="s0">final </span><span class="s1">Parameters p = camera.getParameters(); 
+ 
+        </span><span class="s3">// Create the next level button, which tries to show an interstitial when clicked.</span><span class="s1"> 
+        mNextLevelButton = ((Button) findViewById(R.id.next_level_button)); 
+        mNextLevelButton.setEnabled(</span><span class="s0">false</span><span class="s1">); 
+        mNextLevelButton.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onClick(View view) { 
+                showInterstitial(); 
+            } 
+        }); 
+ 
+        </span><span class="s3">// Create the text view to show the level number.</span><span class="s1"> 
+        mLevelTextView = (TextView) findViewById(R.id.level); 
+        mLevel = START_LEVEL; 
+ 
+        </span><span class="s3">// Create the InterstitialAd and set the adUnitId (defined in values/strings.xml).</span><span class="s1"> 
+        mInterstitialAd = </span><span class="s0">new </span><span class="s1">InterstitialAd(</span><span class="s0">this</span><span class="s1">); 
+        mInterstitialAd.setAdUnitId(getString(R.string.interstitial_ad_unit_id)); 
+        mInterstitialAd.setAdListener(</span><span class="s0">new </span><span class="s1">AdListener() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onAdLoaded() { 
+                mNextLevelButton.setEnabled(</span><span class="s0">true</span><span class="s1">); 
+            } 
+ 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onAdFailedToLoad(</span><span class="s0">int </span><span class="s1">errorCode) { 
+                mNextLevelButton.setEnabled(</span><span class="s0">true</span><span class="s1">); 
+            } 
+ 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onAdClosed() { 
+                </span><span class="s3">// Proceed to the next level.</span><span class="s1"> 
+                goToNextLevel(); 
+            } 
+        }); 
+        loadInterstitial(); 
+ 
+        </span><span class="s3">//Lo que hace el botón &quot;Hola&quot; que se usa para encender y apagar la linterna</span><span class="s1"> 
+        holaPlayerBtn.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onClick(View view) { 
+                </span><span class="s0">try </span><span class="s1">{ 
+                    String TEXTO = getString(R.string.pulsaste); 
+                    Toast.makeText(MainActivity.</span><span class="s0">this</span><span class="s1">, TEXTO, Toast.LENGTH_LONG).show(); 
+ 
+                    </span><span class="s3">//Aqui hay que activar el flash y la cámara</span><span class="s1"> 
+                    </span><span class="s0">if </span><span class="s1">(isLighOn) { 
+ 
+                        Log.i(</span><span class="s4">&quot;info&quot;</span><span class="s1">, </span><span class="s4">&quot;torch is turn off!&quot;</span><span class="s1">); 
+ 
+                        p.setFlashMode(Parameters.FLASH_MODE_OFF); 
+                        camera.setParameters(p); 
+                        camera.stopPreview(); 
+                        isLighOn = </span><span class="s0">false</span><span class="s1">; 
+ 
+                    } </span><span class="s0">else </span><span class="s1">{  </span><span class="s3">//Si camera == null es que se ha liberado la cámara, hay que abrirla otra vez</span><span class="s1"> 
+                        </span><span class="s0">if </span><span class="s1">(camera == </span><span class="s0">null</span><span class="s1">){ 
+                            camera = Camera.open(); 
+ 
+                            </span><span class="s0">try </span><span class="s1">{ 
+                                camera.setPreviewTexture(</span><span class="s0">new </span><span class="s1">SurfaceTexture(</span><span class="s2">0</span><span class="s1">)); 
+                            } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+                                e.printStackTrace(); 
+                            } 
+                            </span><span class="s0">final </span><span class="s1">Parameters p = camera.getParameters(); 
+                        } 
+ 
+                        Log.i(</span><span class="s4">&quot;info&quot;</span><span class="s1">, </span><span class="s4">&quot;torch is turn on!&quot;</span><span class="s1">); 
+ 
+                        p.setFlashMode(Parameters.FLASH_MODE_TORCH); 
+ 
+                        camera.setParameters(p); 
+                        camera.startPreview(); 
+                        isLighOn = </span><span class="s0">true</span><span class="s1">; 
+ 
+                    } 
+ 
+                    } 
+ 
+                   </span><span class="s0">catch </span><span class="s1">(Exception e) { 
+                    e.printStackTrace(); 
+                } 
+            } 
+        }); 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onCreateOptionsMenu(Menu menu) { 
+        </span><span class="s3">// Inflate the menu; this adds items to the action bar if it is present.</span><span class="s1"> 
+        getMenuInflater().inflate(R.menu.menu_main, menu); 
+        </span><span class="s0">return true</span><span class="s1">; 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onOptionsItemSelected(MenuItem item) { 
+        </span><span class="s3">// Handle action bar item clicks here. The action bar will</span><span class="s1"> 
+        </span><span class="s3">// automatically handle clicks on the Home/Up button, so long</span><span class="s1"> 
+        </span><span class="s3">// as you specify a parent activity in AndroidManifest.xml.</span><span class="s1"> 
+ 
+        </span><span class="s0">switch </span><span class="s1">(item.getItemId()) { 
+            </span><span class="s0">case </span><span class="s1">R.id.Otras_apps: 
+                startActivity(</span><span class="s0">new </span><span class="s1">Intent(Intent.ACTION_VIEW, Uri.parse(</span><span class="s4">&quot;market://search?q=pub:</span><span class="s0">\&quot;</span><span class="s4">Pedro Santangelo</span><span class="s0">\&quot;</span><span class="s4">&quot;</span><span class="s1">) ) ); 
+                </span><span class="s0">return true</span><span class="s1">; 
+            </span><span class="s0">case </span><span class="s1">R.id.salir: 
+                FlurryAgent.onEndSession(</span><span class="s0">this</span><span class="s1">); 
+            { 
+                </span><span class="s0">if </span><span class="s1">(camera != </span><span class="s0">null</span><span class="s1">) { 
+                    camera.setPreviewCallback(</span><span class="s0">null</span><span class="s1">); 
+                    camera.stopPreview(); 
+                    camera.release(); 
+                    </span><span class="s3">//Quitar</span><span class="s1"> 
+                    </span><span class="s3">//Toast.makeText(MainActivity.this, &quot;Liberada en Menú&quot;, Toast.LENGTH_LONG).show();</span><span class="s1"> 
+                } 
+ 
+                </span><span class="s0">this</span><span class="s1">.finish(); 
+                </span><span class="s0">return true</span><span class="s1">; 
+            } 
+            </span><span class="s0">default</span><span class="s1">: 
+                </span><span class="s0">return super</span><span class="s1">.onOptionsItemSelected(item); 
+        } 
+ 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">showInterstitial() { 
+        </span><span class="s3">// Show the ad if it's ready. Oth&lt;string name=&quot;otras_apps&quot;&gt;Otras Aplicaciones&lt;/string&gt;oast and reload the ad.</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(mInterstitialAd != </span><span class="s0">null </span><span class="s1">&amp;&amp; mInterstitialAd.isLoaded()) { 
+            mInterstitialAd.show(); 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            Toast.makeText(</span><span class="s0">this</span><span class="s1">, getString(R.string.AdError), Toast.LENGTH_SHORT).show(); 
+            goToNextLevel(); 
+        } 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">loadInterstitial() { 
+        </span><span class="s3">// Disable the next level button and load the ad.</span><span class="s1"> 
+        mNextLevelButton.setEnabled(</span><span class="s0">false</span><span class="s1">); 
+        AdRequest adRequest = </span><span class="s0">new </span><span class="s1">AdRequest.Builder().build(); 
+        mInterstitialAd.loadAd(adRequest); 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">goToNextLevel() { 
+        </span><span class="s3">// Show the next level and reload the ad to prepare for the level after.</span><span class="s1"> 
+        mLevelTextView.setText(getString(R.string.Level) + </span><span class="s4">&quot; &quot; </span><span class="s1">+ (++mLevel)); 
+        loadInterstitial(); 
+ 
+    } 
+ 
+</span><span class="s3">/* 
+    @Override 
+    protected void onDestroy() { 
+        super.onDestroy(); 
+        if (camera != null) { 
+            camera.release(); 
+        } 
+    } 
+ 
+ 
+    @Override 
+    protected void onDestroy() { 
+        super.onDestroy(); 
+        if (isFinishing()) { 
+            if (camera != null) { 
+                // Salimos de la aplicación, liberar cámara 
+                camera.setPreviewCallback(null); 
+                camera.stopPreview(); 
+                camera.release(); 
+                //Quitar 
+                //Toast.makeText(MainActivity.this, &quot;Liberada en onDestroy&quot;, Toast.LENGTH_LONG).show(); 
+ 
+            } else { 
+                //It's an orientation change. 
+            } 
+        } else { 
+            //It's an orientation change. 
+        } 
+    } 
+ 
+*/</span><span class="s1"> 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onStop() { 
+        </span><span class="s3">// Cerrar Sesión de Flurry</span><span class="s1"> 
+        FlurryAgent.onEndSession(</span><span class="s0">this</span><span class="s1">); 
+        </span><span class="s0">super</span><span class="s1">.onStop(); 
+        </span><span class="s0">if </span><span class="s1">(camera != </span><span class="s0">null</span><span class="s1">) { 
+            camera.setPreviewCallback(</span><span class="s0">null</span><span class="s1">); 
+            camera.stopPreview(); 
+            camera.release(); 
+            </span><span class="s3">//Quitar</span><span class="s1"> 
+            </span><span class="s3">//Toast.makeText(MainActivity.this, &quot;Liberada en onStop&quot;, Toast.LENGTH_LONG).show();</span><span class="s1"> 
+        } 
+ 
+    } 
+ 
+ 
+} 
+</span></pre>
+</body>
+</html>

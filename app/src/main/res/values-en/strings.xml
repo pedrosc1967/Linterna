@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lantern</string>
+    <string name="AdError">Error, Ad not loaded</string>
+    <string name="OnOff">ON / OFF</string>
+    <string name="linterna">Lantern</string>
+    <string name="next_level">Next Article</string>
+    <string name="otras_apps">Other Apps</string>
+    <string name="pulsaste">You Pressed ON / OFF</string>
+    <string name="salir">Exit</string>
+    <string name="start_level">Level 1</string>
+    <string name="interstitial_ad_sample">Interstitial Ad Full Screen</string>
+    <string name="Level">Level</string>
+</resources>

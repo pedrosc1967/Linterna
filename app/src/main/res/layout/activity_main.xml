@@ -1,0 +1,59 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context=".MainActivity"
+    android:longClickable="false">
+
+    <!-- view for AdMob Interstitial Ad -->
+    <TextView android:id="@+id/app_title" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp" android:text="@string/interstitial_ad_sample"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+
+    <!-- view for Banner Ad -->
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id">
+    </com.google.android.gms.ads.AdView>
+
+
+    <TextView android:id="@+id/level" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_below="@+id/app_title"
+        android:layout_centerHorizontal="true" android:text="@string/start_level"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button android:id="@+id/next_level_button" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/next_level"
+        android:layout_below="@+id/level"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/OnOff"
+        android:id="@+id/buttononoff"
+
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/linterna"
+        android:id="@+id/textView"
+        android:layout_alignLeft="@+id/level"
+        android:layout_alignStart="@+id/level"
+        android:layout_below="@+id/next_level_button" />
+
+</RelativeLayout>
